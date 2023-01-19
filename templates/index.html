@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body>
+    <div
+      class="flex flex-row items-center justify-center w-3/4 h-screen mx-auto"
+    >
+      <div class="flex flex-col w-1/2">
+        <label class="text-blue-500" for="source_language"
+          >Translate From</label
+        >
+        <select
+          class="text-gray-600 border-b-2 border-blue-500 bg-transparent p-2"
+          name="source_language"
+          id="source_language"
+        >
+          <option value="arabic">Arabic</option>
+          <option value="english" selected>English</option>
+          <option value="german">German</option>
+          <option value="spanish">Spanish</option>
+          <option value="french">French</option>
+          <option value="hebrew">Hebrew</option>
+          <option value="italian">Italian</option>
+          <option value="japanese">Japanese</option>
+          <option value="dutch">Dutch</option>
+          <option value="polish">Polish</option>
+          <option value="portuguese">Portuguese</option>
+          <option value="romanian">Romanian</option>
+          <option value="russian">Russian</option>
+          <option value="swedish">Swedish</option>
+          <option value="turkish">Turkish</option>
+          <option value="ukrainian">Ukrainian</option>
+          <option value="chinese">Chinese</option>
+        </select>
+        <textarea
+          class="text-gray-600 outline-none p-2"
+          name="source_text"
+          id="source_text"
+          cols="30"
+          rows="10"
+          placeholder="e.g. Hello"
+        ></textarea>
+      </div>
+      <span class="p-2"> to </span>
+      <div class="flex flex-col w-1/2">
+        <label class="text-blue-500" for="target_language">Translate To</label>
+        <select
+          class="text-gray-600 border-b-2 border-blue-500 bg-transparent p-2"
+          name="target_language"
+          id="target_language"
+        >
+          <option value="arabic">Arabic</option>
+          <option value="english">English</option>
+          <option value="german">German</option>
+          <option value="spanish">Spanish</option>
+          <option value="french" selected>French</option>
+          <option value="hebrew">Hebrew</option>
+          <option value="italian">Italian</option>
+          <option value="japanese">Japanese</option>
+          <option value="dutch">Dutch</option>
+          <option value="polish">Polish</option>
+          <option value="portuguese">Portuguese</option>
+          <option value="romanian">Romanian</option>
+          <option value="russian">Russian</option>
+          <option value="swedish">Swedish</option>
+          <option value="turkish">Turkish</option>
+          <option value="ukrainian">Ukrainian</option>
+          <option value="chinese">Chinese</option>
+        </select>
+        <textarea
+          class="text-gray-600 outline-none p-2"
+          name="target_text"
+          id="target_text"
+          cols="30"
+          rows="10"
+          disabled
+        ></textarea>
+      </div>
+    </div>
+    <script
+      src="https://code.jquery.com/jquery-3.6.3.min.js"
+      integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU="
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      $("#target_language").on("change", function() {
+          let self = this;
+          $("#source_language")
+              .find("option")
+              .prop("disabled", function() {
+                  return this.value == self.value;
+              });
+      });
+      
+      $("#source_language").on("change", function() {
+          let self = this;
+          $("#target_language")
+              .find("option")
+              .prop("disabled", function() {
+                  return this.value == self.value;
+              });
+      });
+
+      $("#source_text").keyup(async function(e) {
+          await translate_request(e.target.value);
+      });
+
+      $("select").on("change", async function() {
+          await translate_request($("#source_text").val());
+      });
+
+      async function translate_request(word) {
+          src_language = $("#source_language").val();
+          trg_language = $("#target_language").val();
+          if (word.length <= 0) {
+              return;
+          }
+          fetch(
+                  `http://localhost:2020/translate/${src_language}-${trg_language}/${word}`, {
+                      headers: {
+                          "Content-Type": "text/plain",
+                      },
+                  }
+              )
+              .then((response) => response.text())
+              .then((data) => $("#target_text").val(data));
+      }
+    </script>
+  </body>
+</html>
